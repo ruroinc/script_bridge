@@ -1,0 +1,8 @@
+---
+lims:
+  host: https://example.limitlis.cloud/
+  username: test
+  password: test
+
+local:
+  output_path: /Users/ruro/src/git/example/
