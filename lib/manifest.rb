@@ -1,9 +1,11 @@
 
 class Manifest
 
-  def initialize(dir, scripts)
+  attr_accessor :scripts
+
+  def initialize(dir, scripts = nil)
     @dir = dir
-    @scripts = scripts
+    @scripts = scripts.try { |s| s.map(&:to_h) }
   end
 
   def create
@@ -12,12 +14,16 @@ class Manifest
     end
   end
 
+  def scripts
+    @scripts ||= JSON.parse(File.read(path), symbolize_names: true)
+  end
+
   private
 
-  attr_reader :dir, :scripts
+  attr_reader :dir
 
   def data
-    JSON.pretty_generate({ scripts: scripts.map(&:to_h) })
+    JSON.pretty_generate({ scripts: scripts })
   end
 
   def filename

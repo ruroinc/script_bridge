@@ -13,6 +13,10 @@ class Script
     @base_path = base_path
   end
 
+  def code
+    @code ||= File.read(path)
+  end
+
   def filename
     "#{save_name}.rb"
   end

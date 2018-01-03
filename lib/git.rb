@@ -1,42 +1,71 @@
 require 'minigit'
+require 'time'
 
 class Git
 
   attr_reader :git
-  attr_accessor :working_branch, :stashed_changes
+  attr_accessor :working_branch, :need_stash, :new_branch_name
 
   def initialize(dir)
     @git = MiniGit.new(dir)
     @stashed_changes = false
   end
 
-  def pre_pull
-    if changes_made?
-      stash
-      @stashed_changes = true
-    end
+  def pre
+    stash if need_stash
     @working_branch = current_branch
-    git.checkout 'master' unless master?
   end
 
-  def merge_master
+  def post
+    git.checkout working_branch
+    pop_stash if need_stash
+  end
+
+  def pre_pull
+    pre
+    git.checkout 'master'
+    git.checkout({ b: true }, new_branch_name)
+  end
+
+  def pull
     git.add '.'
-    is_dirty = git.commit m: '"latest from LIMS"' rescue false
-    git.push if is_dirty
-    post_pull
+    git.commit m: '"latest from LIMS"' rescue false
+    git.checkout 'master'
+    git.pull
+    git.merge new_branch_name
+  end
+
+  def push
+    git.push
   end
 
   def post_pull
-    git.checkout working_branch
-    pop_stash if stashed_changes
+    post
+    git.branch({ D: true }, new_branch_name)
   end
 
-  def master?
-    current_branch == 'master'
+  def pre_merge
+    pre
   end
 
-  def changes_made?
-    !git.capturing.status.include?('working tree clean')
+  def post_merge
+    post
+  end
+
+  def merge(branch)
+    git.checkout 'master'
+    git.pull
+    git.merge branch
+  end
+
+  def need_stash
+    @need_stash ||= !git.capturing.status.include?('working tree clean')
+  end
+
+  def scripts_changed(branch)
+    git.capturing.git('diff', { 'name-only' => true }, "master..#{branch}").scan(/(.+)(?=.rb)/).flat_map do |f|
+      [:type, :field, :name].zip(f.first.split('/')).to_h
+    end
   end
 
   def current_branch
@@ -45,6 +74,10 @@ class Git
 
   def dir
     git.git_work_tree
+  end
+
+  def new_branch_name
+    @new_branch_name ||= "#{Time.now.getutc.iso8601}-latest-from-LIMS".gsub(':', '-')
   end
 
   def stash

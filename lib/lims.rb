@@ -16,12 +16,13 @@ class Lims
   end
 
   def upload_script(script)
+    signin unless signed_in?
     mech.post(save_script_url, script_params(script))
   end
 
   private
 
-  attr_accessor :num_scripts
+  attr_accessor :num_scripts, :token
   attr_reader :config, :mech
 
   def mech
@@ -34,8 +35,16 @@ class Lims
     /conn.extraParams\['authenticity_token'\] = '(.*)'/
   end
 
+  def extra_token_pattern
+    /extraToken: '(.*)'/
+  end
+
   def signin_token
-    signin_page.match(token_pattern)[1]
+    @token = signin_page.match(token_pattern)[1]
+  end
+
+  def extra_token
+    @token = root_page.match(extra_token_pattern)[1]
   end
 
   def signed_in?
@@ -48,6 +57,10 @@ class Lims
 
   def signin
     mech.post(signin_url, auth_params)
+  end
+
+  def root_page
+    mech.get(root_url, authenticity_token: token).body
   end
 
   def auth_params
@@ -66,7 +79,7 @@ class Lims
         name: script.name,
         code: script.code
       },
-      authenticity_token: 'temp'
+      authenticity_token: extra_token
     }
   end
 

@@ -8,16 +8,22 @@ require_relative 'script'
 
 class ScriptDownloader
 
+  def initialize(skip_push = false)
+    @skip_push = skip_push
+  end
+
   def run
     pre_pull
     save_scripts
     create_manifest
-    merge_master
+    pull
+    push unless skip_push
+    post_pull
   end
 
   private
 
-  attr_reader :lims, :scripts, :config, :output_path, :manifest, :git
+  attr_reader :lims, :scripts, :config, :output_path, :manifest, :git, :skip_push
 
   def save_scripts
     scripts.each do |script|
@@ -31,8 +37,16 @@ class ScriptDownloader
     git.pre_pull
   end
 
-  def merge_master
-    git.merge_master
+  def pull
+    git.pull
+  end
+
+  def push
+    git.push
+  end
+
+  def post_pull
+    git.post_pull
   end
 
   def create_manifest
