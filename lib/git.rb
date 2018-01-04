@@ -29,7 +29,7 @@ class Git
 
   def pull
     git.add '.'
-    git.commit m: '"latest from LIMS"' rescue false
+    git.commit m: pull_commit_message rescue false
     git.checkout 'master'
     git.pull
     git.merge new_branch_name
@@ -64,7 +64,7 @@ class Git
 
   def scripts_changed(branch)
     git.capturing.git('diff', { 'name-only' => true }, "master..#{branch}").scan(/(.+)(?=.rb)/).flat_map do |f|
-      [:type, :field, :name].zip(f.first.split('/')).to_h
+      [:human_type, :human_field, :name].zip(f.first.split('/')).to_h
     end
   end
 
@@ -74,6 +74,10 @@ class Git
 
   def dir
     git.git_work_tree
+  end
+
+  def pull_commit_message
+    "latest from LIMS #{Time.now.getutc.iso8601}"
   end
 
   def new_branch_name

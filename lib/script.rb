@@ -1,14 +1,16 @@
 
 class Script
 
-  attr_reader :id, :name, :save_name, :type, :field, :code, :base_path
+  attr_reader :id, :name, :save_name, :type, :human_type, :field, :human_field, :code, :base_path
 
-  def initialize(id:, name:, type:, field:, code:, base_path:)
+  def initialize(id:, name:, type:, human_type:, field:, human_field:, code:, base_path:)
     @id = id
     @name = name
     @save_name = name.gsub('/', "\u2215")
     @type = type
+    @human_type = human_type
     @field = field
+    @human_field = human_field
     @code = code
     @base_path = base_path
   end
@@ -22,7 +24,7 @@ class Script
   end
 
   def dir
-    File.join(base_path, type, field)
+    File.join(base_path, human_type, human_field)
   end
 
   def path
@@ -39,7 +41,9 @@ class Script
       id: id,
       name: name,
       type: type,
-      field: field
+      human_type: human_type,
+      field: field,
+      human_field: human_field
     }
   end
 end

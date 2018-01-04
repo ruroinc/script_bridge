@@ -58,8 +58,10 @@ class ScriptDownloader
       Script.new(
         id: script['obj_id'],
         name: script['name'],
-        type: script['hum_obj_type'],
-        field: script['hum_field'],
+        type: script['obj_type'],
+        human_type: script['hum_obj_type'],
+        field: script['field'],
+        human_field: script['hum_field'],
         code: script['code'],
         base_path: output_path
       )

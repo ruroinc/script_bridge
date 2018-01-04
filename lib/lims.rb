@@ -74,11 +74,10 @@ class Lims
 
   def script_params(script)
     {
-      id: script.id,
-      script: {
-        name: script.name,
-        code: script.code
-      },
+      obj_id: script.id,
+      obj_type: script.type,
+      field: script.field,
+      script: script.code,
       authenticity_token: extra_token
     }
   end
@@ -96,7 +95,7 @@ class Lims
   end
 
   def save_script_url
-    "#{root_url}/admin/save_script"
+    "#{root_url}/admin/save_script_code"
   end
 
   def config
