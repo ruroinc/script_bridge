@@ -73,7 +73,7 @@ class ScriptDownloader
   end
 
   def git
-    @git ||= Git.new(output_path)
+    @git ||= Git.new
   end
 
   def manifest
@@ -89,4 +89,4 @@ class ScriptDownloader
   end
 end
 
-binding.pry
+# binding.pry

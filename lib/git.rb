@@ -1,13 +1,13 @@
 require 'minigit'
 require 'time'
+require_relative 'config'
 
 class Git
 
   attr_reader :git
-  attr_accessor :working_branch, :need_stash, :new_branch_name
+  attr_accessor :working_branch, :need_stash, :pull_branch_name, :push_branch_name
 
-  def initialize(dir)
-    @git = MiniGit.new(dir)
+  def initialize
     @stashed_changes = false
   end
 
@@ -24,7 +24,7 @@ class Git
   def pre_pull
     pre
     git.checkout 'master'
-    git.checkout({ b: true }, new_branch_name)
+    git.checkout({ b: true }, pull_branch_name)
   end
 
   def pull
@@ -32,7 +32,7 @@ class Git
     git.commit m: pull_commit_message rescue false
     git.checkout 'master'
     git.pull
-    git.merge new_branch_name
+    git.merge pull_branch_name
   end
 
   def push
@@ -41,7 +41,7 @@ class Git
 
   def post_pull
     post
-    git.branch({ D: true }, new_branch_name)
+    delete_branch(pull_branch_name)
   end
 
   def pre_merge
@@ -58,11 +58,24 @@ class Git
     git.merge branch
   end
 
+  def branch_and_commit
+    @working_branch = current_branch
+    git.checkout 'master'
+    git.checkout({ b: true }, push_branch_name)
+    git.add '.'
+    git.commit m: push_commit_message rescue false
+    push_branch_name
+  end
+
+  def delete_branch(branch)
+    git.branch({ D: true }, branch)
+  end
+
   def need_stash
     @need_stash ||= !git.capturing.status.include?('working tree clean')
   end
 
-  def scripts_changed(branch)
+  def modified_scripts(branch)
     git.capturing.git('diff', { 'name-only' => true }, "master..#{branch}").scan(/(.+)(?=.rb)/).flat_map do |f|
       [:human_type, :human_field, :name].zip(f.first.split('/')).to_h
     end
@@ -73,15 +86,35 @@ class Git
   end
 
   def dir
-    git.git_work_tree
+    config.local.output_path
+  end
+
+  def user
+    config.lims.username
+  end
+
+  def config
+    @config ||= Config.data
+  end
+
+  def git
+    @git = MiniGit.new(dir)
   end
 
   def pull_commit_message
     "latest from LIMS #{Time.now.getutc.iso8601}"
   end
 
-  def new_branch_name
-    @new_branch_name ||= "#{Time.now.getutc.iso8601}-latest-from-LIMS".gsub(':', '-')
+  def push_commit_message
+    "#{user} #{Time.now.getutc.iso8601}"
+  end
+
+  def pull_branch_name
+    @pull_branch_name ||= "#{Time.now.getutc.iso8601.gsub(':', '-')}-latest-from-LIMS"
+  end
+
+  def push_branch_name
+    @push_branch_name ||= "#{Time.now.getutc.iso8601.gsub(':', '-')}-#{user}"
   end
 
   def stash

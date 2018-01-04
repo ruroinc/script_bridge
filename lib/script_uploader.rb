@@ -26,18 +26,18 @@ class ScriptUploader
 
   private
 
-  attr_accessor :scripts_changed
+  attr_accessor :modified_scripts
   attr_reader :script_downloader, :git, :config, :output_path, :manifest, :lims
 
   def upload
-    scripts_changed.each do |script|
-      lims.upload_script(script)
+    modified_scripts.each do |script|
+      res = lims.upload_script(script)
     end
   end
 
-  def scripts_changed
-    @scripts_changed ||= git.scripts_changed(branch_name).map do |script|
-      Script.new(script_metadata[:scripts].find { |s| script < s }.merge(code: nil, base_path: output_path))
+  def modified_scripts
+    @modified_scripts ||= git.modified_scripts(branch_name).map do |script|
+      Script.new(script_metadata.find { |s| script < s }.merge(code: nil, base_path: output_path))
     end
   end
 
@@ -66,7 +66,7 @@ class ScriptUploader
   end
 
   def git
-    @git ||= Git.new(output_path)
+    @git ||= Git.new
   end
 
   def output_path
@@ -78,7 +78,7 @@ class ScriptUploader
   end
 
   def script_metadata
-    manifest.scripts
+    manifest.scripts[:scripts]
   end
 
   def manifest
@@ -90,4 +90,4 @@ class ScriptUploader
   end
 end
 
-binding.pry
+# binding.pry

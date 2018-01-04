@@ -4,6 +4,7 @@
 
 # OS
 */.DS_Store
+*.DS_Store
 
 # application config
 /config/application.yml
