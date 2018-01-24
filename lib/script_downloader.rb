@@ -88,5 +88,3 @@ class ScriptDownloader
     @config ||= Config.data
   end
 end
-
-# binding.pry
