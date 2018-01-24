@@ -110,11 +110,11 @@ class Git
   end
 
   def pull_branch_name
-    @pull_branch_name ||= "#{Time.now.getutc.iso8601.gsub(':', '-')}-latest-from-LIMS"
+    @pull_branch_name ||= "#{Time.now.getutc.iso8601.tr(':', '-')}-latest-from-LIMS"
   end
 
   def push_branch_name
-    @push_branch_name ||= "#{Time.now.getutc.iso8601.gsub(':', '-')}-#{user}"
+    @push_branch_name ||= "#{Time.now.getutc.iso8601.tr(':', '-')}-#{user}"
   end
 
   def stash

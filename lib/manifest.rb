@@ -23,7 +23,7 @@ class Manifest
   attr_reader :dir
 
   def data
-    JSON.pretty_generate({ scripts: scripts })
+    JSON.pretty_generate(scripts: scripts)
   end
 
   def filename

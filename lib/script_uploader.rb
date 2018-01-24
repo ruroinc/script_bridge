@@ -31,7 +31,7 @@ class ScriptUploader
 
   def upload
     modified_scripts.each do |script|
-      res = lims.upload_script(script)
+      lims.upload_script(script)
     end
   end
 
@@ -89,5 +89,3 @@ class ScriptUploader
     @lims ||= Lims.new
   end
 end
-
-# binding.pry

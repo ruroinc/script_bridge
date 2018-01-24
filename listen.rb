@@ -17,7 +17,7 @@ class Listener
   attr_reader :config, :manifest, :listener
 
   def listener
-    @listener ||= Listen.to(dir, only: %r{.rb$}) do |modified, added, removed|
+    @listener ||= Listen.to(dir, only: /.rb$/) do |modified, added, removed|
       if modified
         Thread.new(self.send(:listener)) { |l| l.pause }.join
         git = Git.new

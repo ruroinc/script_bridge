@@ -6,7 +6,7 @@ class Script
   def initialize(id:, name:, type:, human_type:, field:, human_field:, code:, base_path:)
     @id = id
     @name = name
-    @save_name = name.gsub('/', "\u2215")
+    @save_name = name.tr('/', "\u2215")
     @type = type
     @human_type = human_type
     @field = field
@@ -33,7 +33,7 @@ class Script
   end
 
   def create_dir(path)
-    FileUtils::mkdir_p(path) unless File.exists?(path)
+    FileUtils.mkdir_p(path) unless File.exist?(path)
   end
 
   def to_h
