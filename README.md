@@ -36,7 +36,7 @@ git remote add origin https://andyruro@bitbucket.org/andyruro/lis32dev.git
 printf '%s\n' '# OS' '*/.DS_Store' '*.DS_Store' > .gitignore
 git add .gitignore
 git commit -m 'init'
-git push --set-upstream origin master
+git push -u origin master
 ```
 
 ### Usage
@@ -90,3 +90,16 @@ Uses filewatcher to automatically push changes when a file is modified. (Note: o
 `ruby listener.rb`
 
 ctrl+c to quit
+
+
+#### Comparing scripts between instances
+
+Comparing some other instance with lis32dev:
+```
+git remote add lis32 https://andyruro@bitbucket.org/andyruro/lis32dev.git
+git fetch lis32 master:lis32
+git checkout lis32
+git push --set-upstream origin lis32
+```
+
+Compare through bitbucket UI
