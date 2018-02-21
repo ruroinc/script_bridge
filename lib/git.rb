@@ -76,7 +76,9 @@ class Git
   end
 
   def modified_scripts(branch)
-    git.capturing.git('diff', { 'name-only' => true }, "master..#{branch}").scan(/(.+)(?=.rb)/).flat_map do |f|
+    args = ['diff', { 'name-only' => true }]
+    args << "master..#{branch}" unless branch == 'master'
+    git.capturing.git(*args).scan(/(.+)(?=.rb)/).flat_map do |f|
       [:human_type, :human_field, :name].zip(f.first.split('/')).to_h
     end
   end

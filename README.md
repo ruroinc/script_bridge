@@ -45,13 +45,13 @@ git push -u origin master
 
 Pulls latest changes from LIMS onto your local machine and pushes it to git
 
-`ruby pull.rb`
+`bundle exec ruby pull.rb`
 
 #### Push
 
 Allows you to push a specified branch to LIMS and git
 
-`ruby push.rb`
+`bundle exec ruby push.rb`
 
 Enter the branch name and press enter
 
@@ -77,7 +77,7 @@ Commit changes
 Use script bridge push script
 
 ```
-ruby push.rb
+bundle exec ruby push.rb
 Enter branch name
 my-new-branch
 ```
@@ -87,10 +87,20 @@ my-new-branch
 
 Uses filewatcher to automatically push changes when a file is modified. (Note: only save one file at a time. Wait for sync to finish before saving again)
 
-`ruby listener.rb`
+`bundle exec ruby listen.rb`
 
 ctrl+c to quit
 
+#### LIS Listen
+
+Like listen, but changes are only updated to LIS and are not commited to git. Useful for testing. Does not pull latest changes from LIS.
+
+`bundle exec ruby lis_listen.rb`
+
+
+#### Git push
+
+Only pushes to git. Does not pull latest changes from LIS.
 
 #### Comparing scripts between instances
 
