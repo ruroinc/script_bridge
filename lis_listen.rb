@@ -1,5 +1,6 @@
 require 'listen'
 require 'pry'
+require 'time'
 require_relative 'lib/config'
 require_relative 'lib/git'
 require_relative 'lib/manifest'
@@ -38,7 +39,7 @@ class LisListener
 
   def upload_script(branch_name)
     ScriptUploader.new(branch_name).send(:upload)
-    puts 'Scripts uploaded!'
+    puts "#{Time.now}: Scripts uploaded!"
   end
 end
 

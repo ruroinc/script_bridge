@@ -28,6 +28,7 @@ class Lims
   def mech
     @mech ||= Mechanize.new.tap do |m|
       m.user_agent_alias = 'Mac Safari'
+      m.verify_mode = OpenSSL::SSL::VERIFY_NONE
     end
   end
 
