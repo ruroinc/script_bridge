@@ -91,16 +91,6 @@ Uses filewatcher to automatically push changes when a file is modified. (Note: o
 
 ctrl+c to quit
 
-#### LIS Listen
-
-Like listen, but changes are only updated to LIS and are not commited to git. Useful for testing. Does not pull latest changes from LIS.
-
-`bundle exec ruby lis_listen.rb`
-
-
-#### Git push
-
-Only pushes to git. Does not pull latest changes from LIS.
 
 #### Comparing scripts between instances
 
