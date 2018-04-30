@@ -8,7 +8,7 @@ class Lims
     signin unless signed_in?
     all_scripts = []
     while all_scripts.size != num_scripts
-      res = JSON.parse(mech.get(scripts_url, start: all_scripts.size).body)
+      res = JSON.parse(mech.get(scripts_url, start: all_scripts.size, code: true).body)
       @num_scripts = res['Total'] unless num_scripts
       all_scripts.concat(res['Scripts'])
     end
