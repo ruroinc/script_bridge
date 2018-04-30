@@ -22,7 +22,7 @@ class Lims
 
   private
 
-  attr_accessor :num_scripts, :token
+  attr_accessor :num_scripts, :token, :version
   attr_reader :config, :mech
 
   def mech
@@ -32,16 +32,32 @@ class Lims
     end
   end
 
+  def version_pattern
+    /productVersion = '(.*)'/
+  end
+
   def token_pattern
-    /conn.extraParams\['authenticity_token'\] = '(.*)'/
+    if version < 7
+      /conn.extraParams\['authenticity_token'\] = '(.*)'/
+    else
+      /o.params.authenticity_token = '(.*)'/
+    end
   end
 
   def extra_token_pattern
-    /extraToken: '(.*)'/
+    if version < 7
+      /extraToken: '(.*)'/
+    else
+      /"extraToken":"(.*)"/
+    end
+  end
+
+  def version
+    @version ||= signin_page.match(version_pattern)[1].to_f
   end
 
   def signin_token
-    @token = signin_page.match(token_pattern)[1]
+    @token ||= signin_page.match(token_pattern)[1]
   end
 
   def extra_token
@@ -57,7 +73,9 @@ class Lims
   end
 
   def signin
-    mech.post(signin_url, auth_params)
+    res = JSON.parse(mech.post(signin_url, auth_params).body, symbolize_names: true)
+    return if res[:success]
+    mech.post(clear_session_url, auth_params.merge(stoken: res[:stoken])).body if version > 7
   end
 
   def root_page
@@ -89,6 +107,10 @@ class Lims
 
   def signin_url
     "#{root_url}/signin"
+  end
+
+  def clear_session_url
+    "#{root_url}/session/clear"
   end
 
   def scripts_url
