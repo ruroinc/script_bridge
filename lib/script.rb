@@ -36,6 +36,14 @@ class Script
     FileUtils.mkdir_p(path) unless File.exist?(path)
   end
 
+  def after_script?
+    human_field.include?('After')
+  end
+
+  def tool?
+    human_type == 'Tool'
+  end
+
   def to_h
     {
       id: id,

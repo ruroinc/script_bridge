@@ -17,7 +17,7 @@ class Lims
 
   def upload_script(script)
     signin unless signed_in?
-    mech.post(save_script_url, script_params(script))
+    mech.post(save_script_url(script), script_params(script))
   end
 
   private
@@ -33,22 +33,22 @@ class Lims
   end
 
   def version_pattern
-    /productVersion = '(.*)'/
+    /productVersion = '(.*?)'/
   end
 
   def token_pattern
     if version < 7
-      /conn.extraParams\['authenticity_token'\] = '(.*)'/
+      /conn.extraParams\['authenticity_token'\] = '(.*?)'/
     else
-      /o.params.authenticity_token = '(.*)'/
+      /o.params.authenticity_token = '(.*?)'/
     end
   end
 
   def extra_token_pattern
     if version < 7
-      /extraToken: '(.*)'/
+      /extraToken: '(.*?)'/
     else
-      /"extraToken":"(.*)"/
+      /"extraToken":"(.*?)"/
     end
   end
 
@@ -92,13 +92,31 @@ class Lims
   end
 
   def script_params(script)
-    {
-      obj_id: script.id,
-      obj_type: script.type,
-      field: script.field,
-      script: script.code,
-      authenticity_token: extra_token
-    }
+    if version < 7
+      {
+        obj_id: script.id,
+        obj_type: script.type,
+        field: script.field,
+        script: script.code,
+        authenticity_token: extra_token
+      }
+    elsif script.tool?
+      {
+        id: script.id,
+        authenticity_token: extra_token,
+        attrs: {}
+      }.tap do |params|
+        sym = script.after_script? ? :after_code : :before_code
+        params[:attrs][sym] = script.code
+      end
+    else
+      {
+        id: script.id,
+        name: script.name,
+        code: script.code,
+        authenticity_token: extra_token
+      }
+    end
   end
 
   def root_url
@@ -117,8 +135,12 @@ class Lims
     "#{root_url}/admin/view_scripts_list"
   end
 
-  def save_script_url
-    "#{root_url}/admin/save_script_code"
+  def save_script_url(script)
+    if script.tool? && version > 7
+      "#{root_url}/flow/save_tool"
+    else
+      "#{root_url}/admin/save_script_code"
+    end
   end
 
   def config
