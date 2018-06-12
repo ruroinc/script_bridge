@@ -6,13 +6,13 @@ class Lims
 
   def scripts
     signin unless signed_in?
-    all_scripts = []
-    while all_scripts.size != num_scripts
-      res = JSON.parse(mech.get(scripts_url, start: all_scripts.size, code: true).body)
-      @num_scripts = res['Total'] unless num_scripts
-      all_scripts.concat(res['Scripts'])
+    [].tap do |all_scripts|
+      while all_scripts.size != num_scripts
+        res = JSON.parse(mech.get(scripts_url, start: all_scripts.size, code: true).body)
+        @num_scripts = res['Total'] unless num_scripts
+        all_scripts.concat(res['Scripts'])
+      end
     end
-    all_scripts
   end
 
   def upload_script(script)
@@ -92,28 +92,18 @@ class Lims
   end
 
   def script_params(script)
-    if version < 7
+    if script.tool?
+      {
+        id: script.id,
+        authenticity_token: extra_token,
+        attrs: { script.field => script.code }
+      }
+    else
       {
         obj_id: script.id,
         obj_type: script.type,
         field: script.field,
         script: script.code,
-        authenticity_token: extra_token
-      }
-    elsif script.tool?
-      {
-        id: script.id,
-        authenticity_token: extra_token,
-        attrs: {}
-      }.tap do |params|
-        sym = script.after_script? ? :after_code : :before_code
-        params[:attrs][sym] = script.code
-      end
-    else
-      {
-        id: script.id,
-        name: script.name,
-        code: script.code,
         authenticity_token: extra_token
       }
     end

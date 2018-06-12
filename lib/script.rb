@@ -1,4 +1,3 @@
-
 class Script
 
   attr_reader :id, :name, :save_name, :type, :human_type, :field, :human_field, :code, :base_path
@@ -36,12 +35,8 @@ class Script
     FileUtils.mkdir_p(path) unless File.exist?(path)
   end
 
-  def after_script?
-    human_field.include?('After')
-  end
-
   def tool?
-    human_type == 'Tool'
+    type == 'Tool'
   end
 
   def to_h
