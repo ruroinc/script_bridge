@@ -8,9 +8,9 @@ class Lims
     signin unless signed_in?
     [].tap do |all_scripts|
       while all_scripts.size != num_scripts
-        res = JSON.parse(mech.get(scripts_url, start: all_scripts.size, code: true).body)
-        @num_scripts = res['Total'] unless num_scripts
-        all_scripts.concat(res['Scripts'])
+        res = JSON.parse(mech.get(scripts_url, start: all_scripts.size, code: true).body).transform_keys!(&:downcase)
+        @num_scripts ||= res['total']
+        all_scripts.concat(res['scripts'])
       end
     end
   end
@@ -75,7 +75,7 @@ class Lims
   def signin
     res = JSON.parse(mech.post(signin_url, auth_params).body, symbolize_names: true)
     return if res[:success]
-    mech.post(clear_session_url, auth_params.merge(stoken: res[:stoken])).body if version > 7
+    res = mech.post(clear_session_url, auth_params.merge(stoken: res[:stoken])).body if version > 7
   end
 
   def root_page
