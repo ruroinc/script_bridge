@@ -88,7 +88,9 @@ class Git
   end
 
   def dir
-    config.local.output_path
+    config.local.output_path.tap do |d|
+      FileUtils.mkdir_p(d) unless File.exist?(d)
+    end
   end
 
   def user
