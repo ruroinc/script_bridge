@@ -114,7 +114,7 @@ class Lims
   end
 
   def signin_url
-    "#{root_url}/signin"
+    "#{root_url}/signin?no_sso"
   end
 
   def clear_session_url
