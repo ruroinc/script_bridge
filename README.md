@@ -32,7 +32,7 @@ The local output path should be a directory with a git repo.
 mkdir lis32dev
 cd lis32dev
 git init
-git remote add origin https://andyruro@bitbucket.org/andyruro/lis32dev.git
+git remote add origin https://github.com/ruroinc/script_bridge.git
 printf '%s\n' '# OS' '*/.DS_Store' '*.DS_Store' > .gitignore
 git add .gitignore
 git commit -m 'init'
