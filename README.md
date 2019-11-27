@@ -14,7 +14,7 @@ These tools allow developers to edit Limfinity scripts on their local machines u
 ### Installing
 
 1. Clone this repo
-  `git clone https://andyruro@bitbucket.org/andyruro/script_bridge.git`
+  `git clone https://github.com/ruroinc/script_bridge.git`
 2. Enter directory
   `cd script_bridge`
 3. Install gems
