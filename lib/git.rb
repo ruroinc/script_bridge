@@ -79,7 +79,7 @@ class Git
     args = ['diff', { 'name-only' => true }]
     args << "master..#{branch}" unless branch == 'master'
     git.capturing.git(*args).scan(/(.+)(?=.rb)/).flat_map do |f|
-      [:human_type, :human_field, :name].zip(f.first.split('/')).to_h
+      [:human_type, :human_field, :name].zip(f.first.split('/')[-3..-1]).to_h
     end
   end
 

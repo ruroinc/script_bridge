@@ -17,7 +17,11 @@ class Lims
 
   def upload_script(script)
     signin unless signed_in?
-    mech.post(save_script_url(script), script_params(script))
+    if script.tool?
+      mech.post(save_script_url(script), script_params(script), 'Content-Type' => 'application/json')
+    else
+      mech.post(save_script_url(script), script_params(script))
+    end
   end
 
   private
@@ -96,8 +100,8 @@ class Lims
       {
         id: script.id,
         authenticity_token: extra_token,
-        attrs: { script.field => script.code }
-      }
+        attrs: tool_params(script)
+      }.to_json
     else
       {
         obj_id: script.id,
@@ -106,6 +110,18 @@ class Lims
         script: script.code,
         authenticity_token: extra_token
       }
+    end
+  end
+
+  def tool_params(script)
+    {
+      script.field => script.code
+    }.tap do |attrs|
+      break attrs unless version > 7
+      signin unless signed_in?
+      res = JSON.parse(mech.post(load_tool_url, id: script.id, authenticity_token: extra_token).body, symbolize_names: true)
+      after_code_params = res.fetch(:after_code_params, []).map { |a| a[:id].to_i }
+      attrs.merge!("after_code_params" => after_code_params)
     end
   end
 
@@ -123,6 +139,10 @@ class Lims
 
   def scripts_url
     "#{root_url}/admin/view_scripts_list"
+  end
+
+  def load_tool_url
+    "#{root_url}/flow/load_tool"
   end
 
   def save_script_url(script)
