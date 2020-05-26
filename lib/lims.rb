@@ -120,7 +120,7 @@ class Lims
       break attrs unless version > 7
       signin unless signed_in?
       res = JSON.parse(mech.post(load_tool_url, id: script.id, authenticity_token: extra_token).body, symbolize_names: true)
-      after_code_params = res.fetch(:after_code_params, []).map { |a| a[:id].to_i }
+      after_code_params = res.fetch(:after_code_params, [])&.map { |a| a[:id].to_i }
       attrs.merge!("after_code_params" => after_code_params)
     end
   end
